@@ -204,7 +204,7 @@ static inline void rtdev_reference(struct rtnet_device *rtdev)
 
 static inline void rtdev_dereference(struct rtnet_device *rtdev)
 {
-    smp_mb__before_atomic_dec();
+    smp_mb__before_atomic();
     atomic_dec(&rtdev->refcount);
 }
 
