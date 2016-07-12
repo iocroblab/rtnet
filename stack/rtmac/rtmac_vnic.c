@@ -287,8 +287,14 @@ int rtmac_vnic_add(struct rtnet_device *rtdev, vnic_xmit_handler vnic_xmit)
     }
 
     snprintf(buf, sizeof(buf), "vnic%d", rtdev->ifindex-1);
+    #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0))
+        vnic = alloc_netdev(sizeof(struct rtnet_device *), buf, rtmac_vnic_setup);
+    #else
+        vnic = alloc_netdev(sizeof(struct rtnet_device *), buf, NET_NAME_UNKNOWN,
+                            rtmac_vnic_setup);
+    #endif
 
-    vnic = alloc_netdev(sizeof(struct rtnet_device *), buf, rtmac_vnic_setup);
+    
     if (!vnic) {
         res = -ENOMEM;
         goto error;

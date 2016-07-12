@@ -366,7 +366,13 @@ static int __init rtnetproxy_init_module(void)
         goto err1;
     }
 
-    dev_rtnetproxy = alloc_netdev(0, "rtproxy", rtnetproxy_init);
+    #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0))
+        dev = alloc_netdev(sizeof(priv_link_t), intf_name, ether_setup);
+        dev_rtnetproxy = alloc_netdev(0, "rtproxy", rtnetproxy_init);
+    #else
+    	dev_rtnetproxy = alloc_netdev(0, "rtproxy", NET_NAME_UNKNOWN,
+    	            rtnetproxy_init);
+    #endif
     if (!dev_rtnetproxy) {
         err = -ENOMEM;
         goto err1;

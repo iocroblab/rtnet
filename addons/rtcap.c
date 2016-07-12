@@ -451,8 +451,14 @@ int __init rtcap_init(void)
             memset(&tap_device[i].tap_dev_stats, 0,
                    sizeof(struct net_device_stats));
 
-            dev = alloc_netdev(sizeof(struct rtnet_device *), rtdev->name,
-                               tap_dev_setup);
+            #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0))
+                dev = alloc_netdev(sizeof(struct rtnet_device *), rtdev->name,
+                      tap_dev_setup);
+            #else
+                dev = alloc_netdev(sizeof(struct rtnet_device *), rtdev->name,
+                      NET_NAME_UNKNOWN, tap_dev_setup);
+            #endif
+               
             if (!dev) {
                 ret = -ENOMEM;
                 goto error3;
@@ -470,9 +476,14 @@ int __init rtcap_init(void)
             tap_device[i].orig_xmit = rtdev->hard_start_xmit;
 
             if ((rtdev->flags & IFF_LOOPBACK) == 0) {
-                dev = alloc_netdev(sizeof(struct rtnet_device *), rtdev->name,
-                                   tap_dev_setup);
-                if (!dev) {
+              #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0))
+                  dev = alloc_netdev(sizeof(struct rtnet_device *), rtdev->name,
+                      tap_dev_setup);
+              #else
+                   dev = alloc_netdev(sizeof(struct rtnet_device *), rtdev->name,
+                      NET_NAME_UNKNOWN, tap_dev_setup);
+            #endif
+                         if (!dev) {
                     ret = -ENOMEM;
                     goto error3;
                 }
